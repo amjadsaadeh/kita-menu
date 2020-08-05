@@ -1,4 +1,4 @@
-# Kita Menu Plan
+# Kita Menu
 An alexa skill and webapp to make the weekly menu of our kita accessible by Echo devices.
 
 ## Motivation
