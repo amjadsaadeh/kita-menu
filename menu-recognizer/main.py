@@ -2,8 +2,11 @@ import base64
 import os
 import json
 import logging
+import datetime
 
 from flask import Flask, request
+
+from google.cloud import firestore
 
 from recognizer import process_image
 
@@ -39,7 +42,13 @@ def index():
             return f'Bad Request: {msg}', 400
         try:
             menu = process_image(data['bucket'], data['name'], 'de') # TODO make language configurable
-            # TODO put into firestore
+            cw = datetime.date.today().isocalendar()[1]
+            db = firestore.Client()
+            doc_ref = db.collection(u'menus').document('mail@amjadsaadeh.de')
+            doc_ref.set({
+                'cw': cw,
+                'menu': menu
+            })
             return ('', 204)
 
         except Exception as e:
