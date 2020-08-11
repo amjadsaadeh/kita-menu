@@ -4,9 +4,9 @@ import json
 import logging
 
 from flask import Flask, request
-from google.cloud import storage
 
-storage_client = storage.Client()
+from recognizer import process_image
+
 app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
@@ -27,20 +27,19 @@ def index():
     if isinstance(pubsub_message, dict) and 'data' in pubsub_message:
         try:
             data = json.loads(base64.b64decode(pubsub_message['data']).decode())
-
         except Exception as e:
             msg = 'Invalid Pub/Sub message: data property is not valid base64 encoded JSON'
             logging.error(e)
             return f'Bad Request: {msg}', 400
 
         # Validate the message is a Cloud Storage event.
-        if not data["name"] or not data["bucket"]:
+        if not data['name'] or not data['bucket']:
             msg = 'Invalid Cloud Storage notification: expected name and bucket properties'
             logging.error(msg)
             return f'Bad Request: {msg}', 400
-
         try:
-            # TODO load data and write algorithm for extraction
+            menu = process_image(data['bucket'], data['name'], 'de') # TODO make language configurable
+            # TODO put into firestore
             return ('', 204)
 
         except Exception as e:

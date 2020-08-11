@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 pylint = "*"
+rope = "*"
 
 [packages]
 pytesseract = "*"
@@ -12,6 +13,7 @@ spacy = "*"
 flask = "*"
 google-cloud-storage = "*"
 gunicorn = "*"
+opencv-python = "*"
 
 [requires]
 python_version = "3.8"

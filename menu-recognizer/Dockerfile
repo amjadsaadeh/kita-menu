@@ -6,14 +6,14 @@ FROM python:3.8
 ENV PYTHONUNBUFFERED True
 
 # Install production dependencies.
-RUN pip install pipenv
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir pipenv
 
 # Copy local code to the container image.
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-RUN pipenv install --system
+RUN pipenv --three && pipenv install --system --deploy
 
 # Run the web service on container startup.
 # Use gunicorn webserver with one worker process and 8 threads.
