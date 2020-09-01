@@ -4,4 +4,11 @@
 
 {% block content %}
 <p>Hallo {{ session.name }}</p>
+
+<div>
+    Aktueller Speiseplan:
+    {% for key, value in menu.items() %}
+        <p>{{ key }}: {{ value }}</p>
+    {% endfor %}
+</div>
 {% endblock %}
