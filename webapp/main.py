@@ -3,6 +3,7 @@ import os
 import json
 import logging
 import datetime
+import functools
 
 from flask import Flask, request, session, render_template, url_for, redirect, flash
 from authlib.integrations.flask_client import OAuth
@@ -11,7 +12,7 @@ from google.cloud import firestore, storage
 import google.auth.credentials
 
 
-BUCKET_NAME = 'kita-menu'
+BUCKET_NAME = 'kita-menu-images'
 
 
 app = Flask(__name__)
@@ -33,11 +34,32 @@ oauth.register(
 )
 
 
+def login_required(func: callable) -> callable:
+    """
+    decorator for login enforcement
+
+    Parameters
+    ----------
+    func : callable
+        function to decorate
+
+    Returns
+    -------
+    callable
+        decorated function
+    """
+    @functools.wraps(func)
+    def login_req_func(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect('login')
+        return func(*args, **kwargs)
+    return login_req_func
+
+
+
 @app.route('/', methods=['GET'])
-def index():
-    if 'user_id' not in session:
-        return redirect('login')
-    
+@login_required
+def index():    
     doc_ref = db.collection(u'menus').document(session['user_id'])
     doc = doc_ref.get().to_dict()
     if doc is None:
@@ -62,9 +84,10 @@ def amazon_auth_finished():
     session['user_id'] = profile['user_id']
     session['name'] = profile['name']
     # do something with the token and profile
-    return redirect('/')
+    return redirect(url_for('index'))
 
 @app.route('/logout', methods=['GET'])
+@login_required
 def logout():
     session.pop('user_id', None)
     session.pop('name', None)
@@ -76,6 +99,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/upload', methods=['GET', 'POST'])
+@login_required
 def upload():
     if 'user_id' not in session:
         return redirect('login')
@@ -98,18 +122,9 @@ def upload():
             bucket = client.bucket(BUCKET_NAME)
             blob = bucket.blob('{:s}.{:s}'.format(session['user_id'], file_ext))
             blob.upload_from_filename('tmp.{:s}'.format(file_ext))
-            return redirect('upload')
-    return '''
-            <!doctype html>
-            <title>Upload new File</title>
-            <h1>Upload new File</h1>
-            <form method=post enctype=multipart/form-data>
-            <input type=file name=file>
-            <input type=submit value=Upload>
-            </form>
-            '''
+            return redirect(url_for('index'))
+    return redirect(url_for('index'))
     
-
 
 if __name__ == '__main__':
     PORT = int(os.getenv('PORT')) if os.getenv('PORT') else 8080
