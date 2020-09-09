@@ -1,15 +1,15 @@
 steps:
 # Build the container image
 - name: 'gcr.io/cloud-builders/docker'
-    args:
+  args:
     - 'build'
     - '--tag=gcr.io/$PROJECT_ID/webapp:latest'
     - '--file=webapp/Dockerfile'
     - './webapp'
 # Deploy container image to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
-    entrypoint: gcloud
-    args: 
+  entrypoint: gcloud
+  args: 
     - 'run'
     - 'deploy'
     - 'webapp'
