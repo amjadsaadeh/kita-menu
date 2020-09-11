@@ -6,7 +6,12 @@ steps:
     - '--tag=gcr.io/$PROJECT_ID/webapp:latest'
     - '--file=webapp/Dockerfile'
     - './webapp'
-  id: 'webapp'
+  id: 'webapp_build'
+# Push to registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/webapp:latest']
+  wait_for: ['webapp_build']
+  id: 'webapp_push'
 # Deploy container image to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
@@ -20,7 +25,7 @@ steps:
   - 'us-east1'
   - '--platform'
   - 'managed'
-  wait_for: ['webapp']
+  wait_for: ['webapp_push']
 
 images:
 - 'gcr.io/$PROJECT_ID/webapp:latest'
