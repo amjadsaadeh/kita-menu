@@ -10,13 +10,15 @@ steps:
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
   args: 
-    - 'run'
-    - 'deploy'
-    - 'webapp'
-    - '--image'
-    - 'gcr.io/$PROJECT_ID/webapp:latest'
-    - '--region'
-    - 'us-east1'
-    - '--platform'
-    - 'managed'
-    
+  - 'run'
+  - 'deploy'
+  - 'webapp'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/webapp:latest'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+
+images:
+- 'gcr.io/$PROJECT_ID/webapp:latest'
