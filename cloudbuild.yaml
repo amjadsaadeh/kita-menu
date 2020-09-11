@@ -1,11 +1,12 @@
 steps:
 # Build the container image
-- name: 'gcr.io/cloud-builders/docker'
+- name: 'gcr.io/$PROJECT_ID/webapp:latest'
   args:
     - 'build'
     - '--tag=gcr.io/$PROJECT_ID/webapp:latest'
     - '--file=webapp/Dockerfile'
     - './webapp'
+  id: 'webapp'
 # Deploy container image to Cloud Run
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: gcloud
@@ -19,6 +20,7 @@ steps:
   - 'us-east1'
   - '--platform'
   - 'managed'
+  wait_for: ['webapp']
 
 images:
 - 'gcr.io/$PROJECT_ID/webapp:latest'
