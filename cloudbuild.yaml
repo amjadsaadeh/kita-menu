@@ -25,6 +25,8 @@ steps:
   - 'us-east1'
   - '--platform'
   - 'managed'
+  - '--update-env-vars'
+  - 'AMAZON_CLIENT_ID=${_AMAZON_CLIENT_ID},AMAZON_CLIENT_SECRET=${_AMAZON_CLIENT_SECRET},SECRET_KEY=${_SECRET_KEY}'
   wait_for: ['webapp_push']
 
 images:
