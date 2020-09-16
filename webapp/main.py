@@ -78,6 +78,9 @@ def index():
 
 @app.route('/login', methods=['GET'])
 def login():
+    # Don't show loginpage when already logged in
+    if 'user_id' in session:
+        return redirect(https_url_for('index'))
     return render_template('login.html')
 
 @app.route('/auth/amazon', methods=['GET'])
