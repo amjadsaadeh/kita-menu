@@ -37,7 +37,7 @@ oauth.register(
 # Override url_for to ensure https scheme in production
 
 def https_url_for(*args, **kwargs):
-    if app.env == 'production':
+    if app.env == 'production' and kwargs.get('_external', False):
         kwargs['_scheme'] = 'https'
     return url_for(*args, **kwargs)
     
