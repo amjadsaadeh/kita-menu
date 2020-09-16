@@ -12,10 +12,22 @@ from google.cloud import firestore, storage
 import google.auth.credentials
 
 
+
 BUCKET_NAME = 'kita-menu-images'
 
 
-app = Flask(__name__)
+# https://www.thetopsites.net/article/52239600.shtml
+class ReverseProxied(object):
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        scheme = environ.get('HTTP_X_FORWARDED_PROTO')
+        if scheme:
+            environ['wsgi.url_scheme'] = scheme
+        return self.app(environ, start_response)
+
+app = ReverseProxied(Flask(__name__))
 app.secret_key = os.environ.get('SECRET_KEY')
 oauth = OAuth(app)
 
@@ -32,6 +44,7 @@ oauth.register(
     access_token_url='https://api.amazon.com/auth/o2/token',
     authorize_url='https://www.amazon.com/ap/oa'
 )
+
 
 
 def login_required(func: callable) -> callable:
