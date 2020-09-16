@@ -16,18 +16,7 @@ import google.auth.credentials
 BUCKET_NAME = 'kita-menu-images'
 
 
-# https://www.thetopsites.net/article/52239600.shtml
-class ReverseProxied(object):
-    def __init__(self, app):
-        self.app = app
-
-    def __call__(self, environ, start_response):
-        scheme = environ.get('HTTP_X_FORWARDED_PROTO')
-        if scheme:
-            environ['wsgi.url_scheme'] = scheme
-        return self.app(environ, start_response)
-
-app = ReverseProxied(Flask(__name__))
+app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
 oauth = OAuth(app)
 
@@ -45,6 +34,13 @@ oauth.register(
     authorize_url='https://www.amazon.com/ap/oa'
 )
 
+# Override url_for to ensure https scheme in production
+
+def https_url_for(*args, **kwargs):
+    if app.env == 'production':
+        kwargs['_scheme'] = 'https'
+    return url_for(*args, **kwargs)
+    
 
 
 def login_required(func: callable) -> callable:
@@ -86,7 +82,7 @@ def login():
 
 @app.route('/auth/amazon', methods=['GET'])
 def amazon_auth():
-    redirect_uri = url_for('amazon_auth_finished', _external=True)
+    redirect_uri = https_url_for('amazon_auth_finished', _external=True)
     return oauth.amazon.authorize_redirect(redirect_uri)
 
 @app.route('/auth/finished', methods=['GET'])
@@ -97,14 +93,14 @@ def amazon_auth_finished():
     session['user_id'] = profile['user_id']
     session['name'] = profile['name']
     # do something with the token and profile
-    return redirect(url_for('index'))
+    return redirect(https_url_for('index'))
 
 @app.route('/logout', methods=['GET'])
 @login_required
 def logout():
     session.pop('user_id', None)
     session.pop('name', None)
-    return redirect(url_for('login'))
+    return redirect(https_url_for('login'))
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
@@ -135,8 +131,8 @@ def upload():
             bucket = client.bucket(BUCKET_NAME)
             blob = bucket.blob('{:s}.{:s}'.format(session['user_id'], file_ext))
             blob.upload_from_filename('tmp.{:s}'.format(file_ext))
-            return redirect(url_for('index'))
-    return redirect(url_for('index'))
+            return redirect(https_url_for('index'))
+    return redirect(https_url_for('index'))
     
 
 if __name__ == '__main__':
