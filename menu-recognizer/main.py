@@ -3,6 +3,7 @@ import os
 import json
 import logging
 import datetime
+from pathlib import Path
 
 from flask import Flask, request
 
@@ -44,7 +45,8 @@ def index():
             menu = process_image(data['bucket'], data['name'], 'de') # TODO make language configurable
             cw = datetime.date.today().isocalendar()[1]
             db = firestore.Client()
-            doc_ref = db.collection(u'menus').document('mail@amjadsaadeh.de')
+            user_id = Path(data['name']).stem
+            doc_ref = db.collection(u'menus').document(user_id)
             doc_ref.set({
                 'cw': cw,
                 'menu': menu

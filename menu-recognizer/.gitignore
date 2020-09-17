@@ -1,1 +1,5 @@
+.env
+*.pyc
+__pycache__
 .vscode/settings.json
+gcp-key.json
