@@ -5,6 +5,8 @@ FROM python:3.8
 # Allow statements and log messages to immediately appear in the Cloud Run logs
 ENV PYTHONUNBUFFERED True
 
+RUN apt-get update && apt-get install -y libgl1-mesa-dev
+
 # Install production dependencies.
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir pipenv
 
