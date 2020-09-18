@@ -57,6 +57,8 @@ steps:
   - 'us-east1'
   - '--platform'
   - 'managed'
+  - '--memory'
+  - '300Mi'
   wait_for: ['menu-recognizer_push']
 
 images:
