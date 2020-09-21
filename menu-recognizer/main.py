@@ -33,7 +33,7 @@ def index():
             data = json.loads(base64.b64decode(pubsub_message['data']).decode())
         except Exception as e:
             msg = 'Invalid Pub/Sub message: data property is not valid base64 encoded JSON'
-            logging.error(e)
+            logging.exception(e)
             return f'Bad Request: {msg}', 400
 
         # Validate the message is a Cloud Storage event.
@@ -54,7 +54,7 @@ def index():
             return ('', 204)
 
         except Exception as e:
-            logging.error(e)
+            logging.exception(e)
             return ('', 500)
 
     return ('', 500)
