@@ -56,7 +56,7 @@ def extract_text(img_path: Path, lang: str) -> str:
     str
         extracted text
     """
-    img = Image.open(str(img_path)).covert('LA')
+    img = Image.open(str(img_path)).convert('L')
     text = pytesseract.image_to_string(img, lang=LANGUAGE_CODE_CONVERTER[lang])
     return text
 
