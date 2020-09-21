@@ -13,10 +13,9 @@ from google.cloud import storage
 
 LanguageCode = namedtuple('LanguageCode', ('iso', 'pytesseract', 'spacy'))
 
+
 LANGUAGE_CODE_CONVERTER = {
-    'de': {
-        LanguageCode('de', 'deu', 'de_core_news_sm')
-    }
+    'de': LanguageCode('de', 'deu', 'de_core_news_sm')
 }
 
 
