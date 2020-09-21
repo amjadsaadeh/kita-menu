@@ -57,7 +57,7 @@ def extract_text(img_path: Path, lang: str) -> str:
         extracted text
     """
     img = Image.open(str(img_path)).convert('L')
-    text = pytesseract.image_to_string(img, lang=LANGUAGE_CODE_CONVERTER[lang])
+    text = pytesseract.image_to_string(img, lang=LANGUAGE_CODE_CONVERTER[lang].pytesseract)
     return text
 
 def generate_menu(words: Iterable) -> Dict[str, str]:
@@ -96,7 +96,7 @@ def generate_menu(words: Iterable) -> Dict[str, str]:
     plan = {day: val.strip() for day, val in plan.items()}
     return plan
 
-def process_document(text: str) -> Iterable:
+def process_document(text: str, lang: str) -> Iterable:
     """
     processes given text as document and returns a list of word in the order they have been recognized
 
@@ -104,6 +104,8 @@ def process_document(text: str) -> Iterable:
     ----------
     text : str
         document as text
+    lang : str
+        language code of the text
 
     Returns
     -------
@@ -119,7 +121,7 @@ def process_document(text: str) -> Iterable:
     ]
     cleaned_text = filter_raw_text(text, seqs_to_remove)
 
-    nlp = spacy.load("de_core_news_sm")
+    nlp = spacy.load(LANGUAGE_CODE_CONVERTER[lang].spacy)
     doc = nlp(cleaned_text)
     tokens = [token for token in doc]
     words = [token for token in tokens if token.is_alpha and len(token) > 1] # Remove abbreations
@@ -140,6 +142,6 @@ def process_image(bucket_name: str, file_name: str, lang: str):
         # OCR
         text = extract_text(dest_name, lang)
 
-    words = process_document(text)    
+    words = process_document(text, lang)    
     menu = generate_menu(words)
     return menu
