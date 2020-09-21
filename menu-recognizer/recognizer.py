@@ -4,7 +4,7 @@ from collections import namedtuple
 import tempfile
 from pathlib import Path
 
-import cv2
+from PIL import Image
 import pytesseract
 import spacy
 
@@ -56,8 +56,7 @@ def extract_text(img_path: Path, lang: str) -> str:
     str
         extracted text
     """
-    img = cv2.imread(str(img_path))
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = Image.open(str(img_path)).covert('LA')
     text = pytesseract.image_to_string(img, lang=LANGUAGE_CODE_CONVERTER[lang])
     return text
 
