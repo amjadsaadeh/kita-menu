@@ -14,7 +14,7 @@ flask = "*"
 google-cloud-storage = "*"
 gunicorn = "*"
 google-cloud-firestore = "*"
-pillow = "*"
+opencv-python = "*"
 
 [requires]
 python_version = "3.8"

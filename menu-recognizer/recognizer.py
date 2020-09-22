@@ -5,7 +5,7 @@ import tempfile
 from pathlib import Path
 import logging
 
-from PIL import Image
+import cv2
 import pytesseract
 import spacy
 
@@ -56,7 +56,8 @@ def extract_text(img_path: Path, lang: str) -> str:
     str
         extracted text
     """
-    img = Image.open(str(img_path)).convert('L')
+    img = cv2.imread(str(img_path))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     text = pytesseract.image_to_string(img, lang=LANGUAGE_CODE_CONVERTER[lang].pytesseract)
     logging.debug('extracted text %s', text)
     return text
@@ -116,9 +117,13 @@ def process_document(text: str, lang: str) -> Iterable:
     # Naive text filtering
     # TODO get from anywhere
     seqs_to_remove = [
-        'Einen frischen Obstteller gibt es jeden Taq / Nachtisch\n\nindividuell',
         'Kennzeichnung der Allergene',
-        'Vesper'
+        'Einen frischen Obstteller gibt es jeden Taq / Nachtisch',
+        'Einen frischen Obstteller gibt es jeden Tag / Nachtisch',
+        'individuell',
+        'Kennzeichnung der Allergene',
+        'Vesper',
+        'GL'
     ]
     cleaned_text = filter_raw_text(text, seqs_to_remove)
 

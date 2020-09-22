@@ -6,7 +6,7 @@ FROM python:3.8
 ENV PYTHONUNBUFFERED True
 
 # Install system tesseract, because pytesseract is only a wrapper
-RUN apt-get update && apt-get install -y tesseract-ocr libtesseract-dev tesseract-ocr-deu
+RUN apt-get update && apt-get install -y libgl1-mesa-dev tesseract-ocr libtesseract-dev tesseract-ocr-deu
 
 # Install production dependencies.
 RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir pipenv
