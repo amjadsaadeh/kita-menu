@@ -7,8 +7,8 @@
 
 <div>
     Aktueller Speiseplan:
-    {% for key, value in menu.items() %}
-        <p>{{ key }}: {{ value }}</p>
+    {% for day, food in menu %}
+        <p>{{ day }}: {{ food }}</p>
     {% endfor %}
 </div>
 

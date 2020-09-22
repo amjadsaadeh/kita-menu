@@ -65,7 +65,6 @@ def login_required(func: callable) -> callable:
     return login_req_func
 
 
-
 @app.route('/', methods=['GET'])
 @login_required
 def index():    
@@ -74,7 +73,18 @@ def index():
     if doc is None:
         doc_ref.create({'cw': datetime.datetime.now().isocalendar()[1], 'menu': {}})
 
-    return render_template('index.html', menu=doc['menu'])
+    # Keep order of days
+    days = (
+        'Montag',
+        'Dienstag',
+        'Mittwoch',
+        'Donnerstag',
+        'Freitag'
+    )
+    menu = [(day, doc['menu'][day]) for day in days]
+
+    return render_template('index.html', menu=menu)
+
 
 @app.route('/login', methods=['GET'])
 def login():
@@ -83,10 +93,12 @@ def login():
         return redirect(https_url_for('index'))
     return render_template('login.html')
 
+
 @app.route('/auth/amazon', methods=['GET'])
 def amazon_auth():
     redirect_uri = https_url_for('amazon_auth_finished', _external=True)
     return oauth.amazon.authorize_redirect(redirect_uri)
+
 
 @app.route('/auth/finished', methods=['GET'])
 def amazon_auth_finished():

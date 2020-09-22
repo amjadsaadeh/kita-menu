@@ -148,6 +148,7 @@ def process_image(bucket_name: str, file_name: str, lang: str):
         blob.download_to_filename(dest_name)
         # OCR
         text = extract_text(dest_name, lang)
+    blob.delete() # Delete image because it isn't needed anymore
 
     words = process_document(text, lang)    
     menu = generate_menu(words)
