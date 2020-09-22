@@ -16,9 +16,9 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 
-RUN pipenv --three && pipenv install --system --deploy
+RUN pipenv install --system --deploy
 # Install spacy model
-RUN pipenv run python -m spacy download de_core_news_sm
+RUN python -m spacy download de_core_news_sm
 
 # Run the web service on container startup.
 # Use gunicorn webserver with one worker process and 8 threads.
