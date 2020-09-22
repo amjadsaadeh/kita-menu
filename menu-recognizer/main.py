@@ -12,9 +12,6 @@ from google.cloud import firestore
 from recognizer import process_image
 
 
-logging.basicConfig(level=logging.DEBUG)
-
-
 app = Flask(__name__)
 
 
