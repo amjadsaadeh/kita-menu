@@ -44,15 +44,24 @@ def index():
             logging.error(msg)
             return f'Bad Request: {msg}', 400
         try:
+            user_id = Path(data['name']).stem
+            
+            progress_doc_ref = db.collection(u'progress').document(user_id)
+            progress_doc_ref.set({'state': 'processing'})
+
             menu = process_image(data['bucket'], data['name'], 'de') # TODO make language configurable
             cw = datetime.date.today().isocalendar()[1]
             db = firestore.Client()
-            user_id = Path(data['name']).stem
-            doc_ref = db.collection(u'menus').document(user_id)
-            doc_ref.set({
+
+            menu_doc_ref = db.collection(u'menus').document(user_id)
+            menu_doc_ref.set({
                 'cw': cw,
                 'menu': menu
             })
+
+            progress_doc_ref = db.collection(u'progress').document(user_id)
+            progress_doc_ref.set({'state': 'complete'})
+
             return ('', 204)
 
         except Exception as e:

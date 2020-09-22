@@ -140,12 +140,17 @@ def upload():
             return redirect(request.url)
 
         if file and allowed_file(file.filename):
+            # Set progress to processing
+            doc_ref = db.collection(u'progress').document(session['user_id'])
+            doc_ref.set({'state': 'upload'})
+
             file_ext = file.filename.rsplit('.', 1)[-1].lower()
             file.save('tmp.{:s}'.format(file_ext))
             client = storage.Client()
             bucket = client.bucket(BUCKET_NAME)
             blob = bucket.blob('{:s}.{:s}'.format(session['user_id'], file_ext))
             blob.upload_from_filename('tmp.{:s}'.format(file_ext))
+
             return redirect(https_url_for('index'))
     return redirect(https_url_for('index'))
     
