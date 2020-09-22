@@ -3,6 +3,7 @@ from typing import Iterable, Dict
 from collections import namedtuple
 import tempfile
 from pathlib import Path
+import logging
 
 from PIL import Image
 import pytesseract
