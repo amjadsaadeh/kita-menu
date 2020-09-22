@@ -57,6 +57,7 @@ def extract_text(img_path: Path, lang: str) -> str:
     """
     img = Image.open(str(img_path)).convert('L')
     text = pytesseract.image_to_string(img, lang=LANGUAGE_CODE_CONVERTER[lang].pytesseract)
+    logging.debug('extracted text %s', text)
     return text
 
 def generate_menu(words: Iterable) -> Dict[str, str]:
@@ -124,6 +125,7 @@ def process_document(text: str, lang: str) -> Iterable:
     doc = nlp(cleaned_text)
     tokens = [token for token in doc]
     words = [token for token in tokens if token.is_alpha and len(token) > 1] # Remove abbreations
+    logging.debug('Found words: %s', words)
     return words
 
 def process_image(bucket_name: str, file_name: str, lang: str):
