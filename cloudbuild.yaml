@@ -30,6 +30,7 @@ steps:
   - 'AMAZON_CLIENT_ID=${_AMAZON_CLIENT_ID},AMAZON_CLIENT_SECRET=${_AMAZON_CLIENT_SECRET},SECRET_KEY=${_SECRET_KEY},PREFERRED_URL_SCHEME=https'
   - '--allow-unauthenticated'
   wait_for: ['webapp_push']
+  id: 'webapp_deploy'
 
 # === Menu recognizer ===
 - name: 'gcr.io/cloud-builders/docker'
@@ -60,6 +61,7 @@ steps:
   - '--memory'
   - '300Mi'
   wait_for: ['menu-recognizer_push']
+  id: 'menu-recognizer_deploy'
 
 images:
 - 'gcr.io/$PROJECT_ID/webapp:latest'
