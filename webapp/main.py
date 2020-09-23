@@ -68,10 +68,17 @@ def login_required(func: callable) -> callable:
 @app.route('/', methods=['GET'])
 @login_required
 def index():    
-    doc_ref = db.collection(u'menus').document(session['user_id'])
-    doc = doc_ref.get().to_dict()
-    if doc is None:
-        doc_ref.create({'cw': datetime.datetime.now().isocalendar()[1], 'menu': {}})
+    menu_doc_ref = db.collection(u'menus').document(session['user_id'])
+    menu_doc = menu_doc_ref.get().to_dict()
+    if menu_doc is None:
+        menu_doc_ref.create({'cw': datetime.datetime.now().isocalendar()[1], 'menu': {}})
+
+    
+    progress_doc_ref = db.collection(u'progress').document(session['user_id'])
+    progress_doc = progress_doc_ref.get().to_dict()
+    progress = None
+    if progress_doc is not None:
+        progress = progress_doc['state']
 
     # Keep order of days
     days = (
@@ -83,7 +90,7 @@ def index():
     )
     menu = [(day, doc['menu'][day]) for day in days]
 
-    return render_template('index.html', menu=menu)
+    return render_template('index.html', menu=menu, progress=progress)
 
 
 @app.route('/login', methods=['GET'])

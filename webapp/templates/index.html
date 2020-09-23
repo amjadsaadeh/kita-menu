@@ -7,9 +7,13 @@
 
 <div>
     Aktueller Speiseplan:
-    {% for day, food in menu %}
-        <p>{{ day }}: {{ food }}</p>
-    {% endfor %}
+    {% if progress != 'complete' %}
+        <p>In Bearbeitung</p>
+    {% else %}
+        {% for day, food in menu %}
+            <p>{{ day }}: {{ food }}</p>
+        {% endfor %}
+    {% endif %}
 </div>
 
 <div>
