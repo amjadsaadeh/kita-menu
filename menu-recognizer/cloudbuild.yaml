@@ -26,7 +26,7 @@ steps:
   - '--platform'
   - 'managed'
   - '--memory'
-  - '350Mi'
+  - '450Mi'
   wait_for: ['menu-recognizer_push']
   id: 'menu-recognizer_deploy'
 
