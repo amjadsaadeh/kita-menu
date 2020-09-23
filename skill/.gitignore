@@ -1,0 +1,7 @@
+.env
+*.pyc
+__pycache__
+.vscode/settings.json
+.vscode/.ropeproject
+gcp-key.json
+tmp.*

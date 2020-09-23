@@ -1,0 +1,67 @@
+steps:
+# === skill ===
+# Build the container image
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '--tag=gcr.io/$PROJECT_ID/skill:latest'
+    - '--file=skill/Dockerfile'
+    - './skill'
+  id: 'skill_build'
+# Push to registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/skill:latest']
+  wait_for: ['skill_build']
+  id: 'skill_push'
+# Deploy container image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+  - 'run'
+  - 'deploy'
+  - 'skill'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/skill:latest'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--update-env-vars'
+  - 'ALEXA_SKILL_ID=${_ALEXA_SKILL_ID}'
+  - '--allow-unauthenticated'
+  wait_for: ['skill_push']
+  id: 'skill_deploy'
+
+# === Menu recognizer ===
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+    - 'build'
+    - '--tag=gcr.io/$PROJECT_ID/menu-recognizer:latest'
+    - '--file=menu-recognizer/Dockerfile'
+    - './menu-recognizer'
+  id: 'menu-recognizer_build'
+# Push to registry
+- name: 'gcr.io/cloud-builders/docker'
+  args: ['push', 'gcr.io/$PROJECT_ID/menu-recognizer:latest']
+  wait_for: ['menu-recognizer_build']
+  id: 'menu-recognizer_push'
+# Deploy container image to Cloud Run
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+  - 'run'
+  - 'deploy'
+  - 'menu-recognizer'
+  - '--image'
+  - 'gcr.io/$PROJECT_ID/menu-recognizer:latest'
+  - '--region'
+  - 'us-east1'
+  - '--platform'
+  - 'managed'
+  - '--memory'
+  - '350Mi'
+  wait_for: ['menu-recognizer_push']
+  id: 'menu-recognizer_deploy'
+
+images:
+- 'gcr.io/$PROJECT_ID/skill:latest'
