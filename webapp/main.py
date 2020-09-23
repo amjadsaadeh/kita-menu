@@ -88,7 +88,7 @@ def index():
         'Donnerstag',
         'Freitag'
     )
-    menu = [(day, doc['menu'][day]) for day in days]
+    menu = [(day, menu_doc['menu'][day]) for day in days]
 
     return render_template('index.html', menu=menu, progress=progress)
 
