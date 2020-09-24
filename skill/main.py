@@ -26,3 +26,7 @@ skill_adapter = SkillAdapter(skill=sb.create(), skill_id=SKILL_ID, app=app)
 @app.route("/")
 def invoke_skill():
     return skill_adapter.dispatch_request()
+
+if __name__ == '__main__':
+    PORT = int(os.getenv('PORT')) if os.getenv('PORT') else 8080
+    app.run(host='127.0.0.1', port=PORT, debug=True)
