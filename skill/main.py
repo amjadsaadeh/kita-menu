@@ -8,6 +8,8 @@ from intendhandlers import *
 
 SKILL_ID = os.environ['ALEXA_SKILL_ID']
 
+app = Flask(__name__)
+
 sb = SkillBuilder()
 
 sb.add_request_handler(LaunchRequestHandler())
@@ -19,11 +21,9 @@ sb.add_request_handler(SessionEndedRequestHandler())
 
 sb.add_exception_handler(AllExceptionHandler())
 
-app = Flask(__name__)
-
 skill_adapter = SkillAdapter(skill=sb.create(), skill_id=SKILL_ID, app=app)
 
-@app.route("/")
+@app.route("/", methods=['POST'])
 def invoke_skill():
     return skill_adapter.dispatch_request()
 
