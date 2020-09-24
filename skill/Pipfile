@@ -10,6 +10,7 @@ pylint = "*"
 ask-sdk-core = "*"
 google-cloud-firestore = "*"
 flask-ask-sdk = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.8"
