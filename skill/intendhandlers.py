@@ -1,3 +1,5 @@
+import datetime
+
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from ask_sdk_core.utils import is_request_type, is_intent_name, request_util
 from ask_sdk_model import Response
@@ -26,10 +28,25 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        # TODO impleement  one day
 
         day = request_util.get_slot_value(handler_input, 'day')
 
+        weekdays = ('Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag')
+        if day not in weekdays:
+            if day is None or day.lower() == 'heute':
+                weekday_idx = datetime.datetime.today().weekday()
+            elif day.lower() == 'morgen':
+                weekday_idx = datetime.datetime.today().weekday() + 1
+            elif day.lower() == 'übermorgen':
+                weekday_idx = datetime.datetime.today().weekday() + 2
+            elif day.lower() == 'gestern':
+                weekday_idx = datetime.datetime.today().weekday() - 1
+            elif day.lower() == 'vorgestern':
+                weekday_idx = datetime.datetime.today().weekday() - 2
+            
+            day = weekdays[weekday_idx % len(weekdays)]
+        
+        # TODO connect to firestore to get the food
         speech_text = f"Der angefragete Tag ist {day}"
 
         handler_input.response_builder.speak(speech_text).set_card(
