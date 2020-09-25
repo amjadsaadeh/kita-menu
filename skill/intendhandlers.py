@@ -1,8 +1,9 @@
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
-from ask_sdk_core.utils import is_request_type, is_intent_name
+from ask_sdk_core.utils import is_request_type, is_intent_name, request_util
 from ask_sdk_model import Response
 from ask_sdk_model.ui import SimpleCard
 from ask_sdk_core.handler_input import HandlerInput
+
 
 class LaunchRequestHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -26,7 +27,10 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
         # TODO impleement  one day
-        speech_text = "Hello World"
+
+        day = request_util.get_slot_value(handler_input, 'day')
+
+        speech_text = f"Der angefragete Tag ist {day}"
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("Hello World", speech_text)).set_should_end_session(

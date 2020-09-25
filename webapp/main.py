@@ -11,6 +11,11 @@ from authlib.integrations.flask_client import OAuth
 from google.cloud import firestore, storage
 import google.auth.credentials
 
+try:
+  import googleclouddebugger
+  googleclouddebugger.enable(breakpoint_enable_canary=True)
+except ImportError:
+  pass
 
 
 BUCKET_NAME = 'kita-menu-images'
