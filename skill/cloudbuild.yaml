@@ -1,6 +1,14 @@
 steps:
 # === skill ===
 # Build the container image
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gcloud
+  args: 
+  - 'debug'
+  - 'source'
+  - 'gen-repo-info-file'
+  - '--output-directory=./skill'
+  id: 'skill_debugger_context'
 - name: 'gcr.io/cloud-builders/docker'
   args:
     - 'build'
@@ -8,6 +16,7 @@ steps:
     - '--file=skill/Dockerfile'
     - './skill'
   id: 'skill_build'
+  wait_for: ['skill_debugger_context']
 # Push to registry
 - name: 'gcr.io/cloud-builders/docker'
   args: ['push', 'gcr.io/$PROJECT_ID/skill:latest']

@@ -4,6 +4,12 @@ from flask import Flask
 from ask_sdk_core.skill_builder import SkillBuilder
 from flask_ask_sdk.skill_adapter import SkillAdapter
 
+try:
+  import googleclouddebugger
+  googleclouddebugger.enable(breakpoint_enable_canary=True)
+except ImportError:
+  pass
+
 from intendhandlers import *
 
 SKILL_ID = os.environ['ALEXA_SKILL_ID']
