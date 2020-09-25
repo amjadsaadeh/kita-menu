@@ -7,7 +7,6 @@ steps:
   - 'debug'
   - 'source'
   - 'gen-repo-info-file'
-  - '--output-directory=./skill'
   id: 'skill_debugger_context'
 - name: 'gcr.io/cloud-builders/docker'
   args:
