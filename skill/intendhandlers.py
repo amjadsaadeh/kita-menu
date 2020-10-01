@@ -57,7 +57,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
         cur_week = datetime.datetime.now().isocalendar()[1]
         menu_doc = menu_doc_ref.get().to_dict()
         if menu_doc is None:
-            logging.info('Cannot find user with id %s', user_id)
+            logging.warn('Cannot find user with id %s', user_id)
             card_title = 'Kita Speiseplan Fehler'
             speech_text = 'Der angegebener Benutzer wurde leider nicht gefunden.'
         elif cur_week != menu_doc['cw']:
