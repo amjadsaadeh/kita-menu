@@ -64,7 +64,9 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             return handler_input.response_builder.response
 
         r = requests.get('https://api.amazon.com/user/profile', params={'access_token': account_linking_token})
+        logging.warn(r)
         response = r.json()
+        logging.warn(response)
         user_id = response['user_id']
         menu_doc_ref = db.collection(u'menus').document(user_id)
         cur_week = datetime.datetime.now().isocalendar()[1]
@@ -152,7 +154,7 @@ class AllExceptionHandler(AbstractExceptionHandler):
     def handle(self, handler_input, exception):
         # type: (HandlerInput, Exception) -> Response
         # Log the exception in CloudWatch Logs
-        print(exception)
+        logging.exception(exception)
 
         speech = "Entschuldigung, ich habe dich nicht richtig verstanden"
         handler_input.response_builder.speak(speech).ask(speech)
