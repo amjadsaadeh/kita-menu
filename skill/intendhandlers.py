@@ -6,7 +6,7 @@ import requests
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from ask_sdk_core.utils import is_request_type, is_intent_name, request_util
 from ask_sdk_model import Response
-from ask_sdk_model.ui import SimpleCard
+from ask_sdk_model.ui import SimpleCard, LinkAccount
 from ask_sdk_core.handler_input import HandlerInput
 
 from google.cloud import firestore
@@ -56,10 +56,10 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
 
         account_linking_token = request_util.get_account_linking_access_token(handler_input)
         if account_linking_token is None:
-            card_title = 'Nicht angemeldet'
+            card_title = 'Nicht Verunden'
             speech_text = 'Sie haben Ihren Alexa Account noch nicht mit Kita Essensplan verbunden.'
             handler_input.response_builder.speak(speech_text).set_card(
-                SimpleCard(card_title, speech_text)).set_should_end_session(
+                LinkAccount(card_title, speech_text)).set_should_end_session(
                 True)
             return handler_input.response_builder.response
 
