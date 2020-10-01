@@ -59,7 +59,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             card_title = 'Nicht Verunden'
             speech_text = 'Sie haben Ihren Alexa Account noch nicht mit Kita Essensplan verbunden.'
             handler_input.response_builder.speak(speech_text).set_card(
-                LinkAccountCard(card_title, speech_text)).set_should_end_session(
+                LinkAccountCard()).set_should_end_session(
                 True)
             return handler_input.response_builder.response
 
