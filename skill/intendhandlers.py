@@ -6,7 +6,7 @@ import requests
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from ask_sdk_core.utils import is_request_type, is_intent_name, request_util
 from ask_sdk_model import Response
-from ask_sdk_model.ui import SimpleCard, LinkAccount
+from ask_sdk_model.ui import SimpleCard, LinkAccountCard
 from ask_sdk_core.handler_input import HandlerInput
 
 from google.cloud import firestore
@@ -59,7 +59,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             card_title = 'Nicht Verunden'
             speech_text = 'Sie haben Ihren Alexa Account noch nicht mit Kita Essensplan verbunden.'
             handler_input.response_builder.speak(speech_text).set_card(
-                LinkAccount(card_title, speech_text)).set_should_end_session(
+                LinkAccountCard(card_title, speech_text)).set_should_end_session(
                 True)
             return handler_input.response_builder.response
 
