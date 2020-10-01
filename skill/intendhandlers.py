@@ -51,12 +51,8 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
                 weekday_idx = datetime.datetime.today().weekday() - 2
             
             day = weekdays[weekday_idx % len(weekdays)]
-        
-        # TODO connect to firestore to get the food
-        speech_text = f"Der angefragete Tag ist {day}"
 
-        user = handler_input['request_envelope']['session']['user']
-        user_id = user.attribute_map['user_id']
+        user_id = request_util.ger_user_id(handler_input)
         menu_doc_ref = db.collection(u'menus').document(user_id)
         cur_week = datetime.datetime.now().isocalendar()[1]
         menu_doc = menu_doc_ref.get().to_dict()
