@@ -64,9 +64,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             return handler_input.response_builder.response
 
         r = requests.get('https://api.amazon.com/user/profile', params={'access_token': account_linking_token})
-        logging.warn(r)
         response = r.json()
-        logging.warn(response)
         user_id = response['user_id']
         menu_doc_ref = db.collection(u'menus').document(user_id)
         cur_week = datetime.datetime.now().isocalendar()[1]
@@ -83,7 +81,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             card_title = 'Wochenede'
             speech_text = 'Für das Wochenende gibt es keinen Speiseplan.'
         else:
-            food = menu_doc[day]
+            food = menu_doc['menu'][day]
             card_title = f'Das Essen für heute ist {food}'
             speech_text = f'Heute gibt es: {food}.'
 
