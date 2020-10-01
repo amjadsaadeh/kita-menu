@@ -52,7 +52,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             
             day = weekdays[weekday_idx % len(weekdays)]
 
-        user_id = request_util.ger_user_id(handler_input)
+        user_id = request_util.get_user_id(handler_input)
         menu_doc_ref = db.collection(u'menus').document(user_id)
         cur_week = datetime.datetime.now().isocalendar()[1]
         menu_doc = menu_doc_ref.get().to_dict()
