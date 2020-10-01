@@ -1,10 +1,16 @@
 import datetime
+import logging
 
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from ask_sdk_core.utils import is_request_type, is_intent_name, request_util
 from ask_sdk_model import Response
 from ask_sdk_model.ui import SimpleCard
 from ask_sdk_core.handler_input import HandlerInput
+
+from google.cloud import firestore, storage
+
+
+db = firestore.Client()
 
 
 class LaunchRequestHandler(AbstractRequestHandler):
@@ -49,8 +55,30 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
         # TODO connect to firestore to get the food
         speech_text = f"Der angefragete Tag ist {day}"
 
+        user = handler_input['request_envelope']['session']['user']
+        user_id = user.attribute_map['user_id']
+        menu_doc_ref = db.collection(u'menus').document(user_id)
+        cur_week = datetime.datetime.now().isocalendar()[1]
+        menu_doc = menu_doc_ref.get().to_dict()
+        if menu_doc is None:
+            logging.info('Cannot find user with id %s', user_id)
+            card_title = 'Kita Speiseplan Fehler'
+            speech_text = 'Der angegebener Benutzer wurde leider nicht gefunden.'
+        elif cur_week != menu_doc['cw']:
+            card_title = 'Kein Speiseplan für diese Woche vorhanden'
+            speech_text = 'Leider ist für diese Woche noch kein Speiseplan vorhanden. Lade einen neuen hoch, um ihn '+\
+                'dir Ansagen lassen zu können.'
+        elif day == 'Samstag' or day == 'Sonntag':
+            card_title = 'Wochenede'
+            speech_text = 'Für das Wochenende gibt es keinen Speiseplan.'
+        else:
+            food = menu_doc[day]
+            card_title = f'Das Essen für heute ist {food}'
+            speech_text = f'Heute gibt es: {food}.'
+
+
         handler_input.response_builder.speak(speech_text).set_card(
-            SimpleCard("Hello World", speech_text)).set_should_end_session(
+            SimpleCard(card_title, speech_text)).set_should_end_session(
             True)
         return handler_input.response_builder.response
 

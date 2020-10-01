@@ -72,7 +72,7 @@ def login_required(func: callable) -> callable:
 
 @app.route('/', methods=['GET'])
 @login_required
-def index():    
+def index():
     menu_doc_ref = db.collection(u'menus').document(session['user_id'])
     menu_doc = menu_doc_ref.get().to_dict()
     if menu_doc is None:
