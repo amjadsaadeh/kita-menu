@@ -15,6 +15,36 @@ from google.cloud import firestore
 db = firestore.Client()
 
 
+def get_amzon_user_id(handler_input):
+    """
+    Extracts the amazon user id from handler input
+
+    Parameters
+    ----------
+    handler_input : [type]
+        [description]
+
+    Returns
+    -------
+    [type]
+        amazon user id as string or None if no account is linked
+    """
+
+    account_linking_token = request_util.get_account_linking_access_token(handler_input)
+    if account_linking_token is None:
+        return None
+
+    r = requests.get('https://api.amazon.com/user/profile', params={'access_token': account_linking_token})
+    response = r.json()
+    user_id = response['user_id']
+    return user_id
+
+def generate_account_linking_card(handler_input):
+    handler_input.response_builder.speak(speech_text).set_card(
+        LinkAccountCard()).set_should_end_session(
+        True)
+    return handler_input.response_builder.response
+
 class LaunchRequestHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
@@ -54,18 +84,11 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             
             day = weekdays[weekday_idx % len(weekdays)]
 
-        account_linking_token = request_util.get_account_linking_access_token(handler_input)
-        if account_linking_token is None:
-            card_title = 'Nicht Verunden'
-            speech_text = 'Sie haben Ihren Alexa Account noch nicht mit Kita Essensplan verbunden.'
-            handler_input.response_builder.speak(speech_text).set_card(
-                LinkAccountCard()).set_should_end_session(
-                True)
-            return handler_input.response_builder.response
+        user_id = get_amzon_user_id(handler_input)
+        if user_id is None:
+            # We got account linking request
+            return generate_account_linking_card(handler_input)
 
-        r = requests.get('https://api.amazon.com/user/profile', params={'access_token': account_linking_token})
-        response = r.json()
-        user_id = response['user_id']
         menu_doc_ref = db.collection(u'menus').document(user_id)
         cur_week = datetime.datetime.now().isocalendar()[1]
         menu_doc = menu_doc_ref.get().to_dict()
@@ -85,7 +108,6 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             card_title = f'Das Essen für heute ist {food}'
             speech_text = f'Heute gibt es: {food}.'
 
-
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard(card_title, speech_text)).set_should_end_session(
             True)
@@ -97,12 +119,30 @@ class FoodForWeekIntentHandler(AbstractRequestHandler):
         return is_intent_name("FoodForWeek")(handler_input)
 
     def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        # TODO impleement  one day
-        speech_text = "Hello World"
+        user_id = get_amzon_user_id(handler_input)
+        if user_id is None:
+            # We got account linking request
+            return generate_account_linking_card(handler_input)
+
+        menu_doc_ref = db.collection(u'menus').document(user_id)
+        cur_week = datetime.datetime.now().isocalendar()[1]
+        menu_doc = menu_doc_ref.get().to_dict()
+        if menu_doc is None:
+            logging.warn('Cannot find user with id %s', user_id)
+            card_title = 'Kita Speiseplan Fehler'
+            speech_text = 'Der angegebener Benutzer wurde leider nicht gefunden. Loggen Sie sich bitte initial auf '+\
+                'der Website ein.'
+        elif cur_week != menu_doc['cw']:
+            card_title = 'Kein Speiseplan für diese Woche vorhanden'
+            speech_text = 'Leider ist für diese Woche noch kein Speiseplan vorhanden. Lades Sie einen neuen hoch, '+\
+                'um ihn dir Ansagen lassen zu können.'
+        else:
+            card_title = 'Das Essen für diese Woche'
+            parts = ['Am {:s} gibt es {:s}'.format(day, food) for day, food in menu_doc['menu']]
+            speech_text = '\n'.join(parts)
 
         handler_input.response_builder.speak(speech_text).set_card(
-            SimpleCard("Hello World", speech_text)).set_should_end_session(
+            SimpleCard(card_title, speech_text)).set_should_end_session(
             True)
         return handler_input.response_builder.response
 
