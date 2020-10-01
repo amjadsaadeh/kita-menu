@@ -1,6 +1,8 @@
 import datetime
 import logging
 
+import requests
+
 from ask_sdk_core.dispatch_components import AbstractRequestHandler, AbstractExceptionHandler
 from ask_sdk_core.utils import is_request_type, is_intent_name, request_util
 from ask_sdk_model import Response
@@ -52,7 +54,18 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             
             day = weekdays[weekday_idx % len(weekdays)]
 
-        user_id = request_util.get_user_id(handler_input)
+        account_linking_token = request_util.get_account_linking_access_token(handler_input)
+        if account_linking_token is None:
+            card_title = 'Nicht angemeldet'
+            speech_text = 'Sie haben Ihren Alexa Account noch nicht mit Kita Essensplan verbunden.'
+            handler_input.response_builder.speak(speech_text).set_card(
+                SimpleCard(card_title, speech_text)).set_should_end_session(
+                True)
+            return handler_input.response_builder.response
+
+        r = requests.get('https://api.amazon.com/user/profile', params={'access_token': account_linking_token})
+        response = r.json()
+        user_id = response['user_id']
         menu_doc_ref = db.collection(u'menus').document(user_id)
         cur_week = datetime.datetime.now().isocalendar()[1]
         menu_doc = menu_doc_ref.get().to_dict()

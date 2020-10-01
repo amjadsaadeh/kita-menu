@@ -12,6 +12,7 @@ google-cloud-firestore = "*"
 flask-ask-sdk = "*"
 gunicorn = "*"
 google-python-cloud-debugger = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
