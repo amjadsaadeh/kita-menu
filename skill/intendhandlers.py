@@ -15,7 +15,7 @@ from google.cloud import firestore
 db = firestore.Client()
 
 
-def get_amzon_user_id(handler_input):
+def get_amazon_user_id(handler_input):
     """
     Extracts the amazon user id from handler input
 
@@ -40,6 +40,7 @@ def get_amzon_user_id(handler_input):
     return user_id
 
 def generate_account_linking_card(handler_input):
+    speech_text = 'Bitte verbinde deinen Alexa Account mit dem Kita Essensplan.'
     handler_input.response_builder.speak(speech_text).set_card(
         LinkAccountCard()).set_should_end_session(
         True)
@@ -72,6 +73,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
         weekdays = ('Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag')
         if day not in weekdays:
             if day is None or day.lower() == 'heute':
+                day = 'heute'
                 weekday_idx = datetime.datetime.today().weekday()
             elif day.lower() == 'morgen':
                 weekday_idx = datetime.datetime.today().weekday() + 1
@@ -84,7 +86,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
             
             day = weekdays[weekday_idx % len(weekdays)]
 
-        user_id = get_amzon_user_id(handler_input)
+        user_id = get_amazon_user_id(handler_input)
         if user_id is None:
             # We got account linking request
             return generate_account_linking_card(handler_input)
@@ -106,7 +108,7 @@ class FoodForOneDayIntentHandler(AbstractRequestHandler):
         else:
             food = menu_doc['menu'][day]
             card_title = f'Das Essen für heute ist {food}'
-            speech_text = f'Heute gibt es: {food}.'
+            speech_text = f'{day} gibt es: {food}.'
 
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard(card_title, speech_text)).set_should_end_session(
@@ -119,7 +121,7 @@ class FoodForWeekIntentHandler(AbstractRequestHandler):
         return is_intent_name("FoodForWeek")(handler_input)
 
     def handle(self, handler_input):
-        user_id = get_amzon_user_id(handler_input)
+        user_id = get_amazon_user_id(handler_input)
         if user_id is None:
             # We got account linking request
             return generate_account_linking_card(handler_input)
@@ -138,7 +140,7 @@ class FoodForWeekIntentHandler(AbstractRequestHandler):
                 'um ihn dir Ansagen lassen zu können.'
         else:
             card_title = 'Das Essen für diese Woche'
-            parts = ['Am {:s} gibt es {:s}'.format(day, food) for day, food in menu_doc['menu']]
+            parts = ['Am {:s} gibt es {:s}'.format(day, food) for day, food in menu_doc['menu'].items()]
             speech_text = '\n'.join(parts)
 
         handler_input.response_builder.speak(speech_text).set_card(
