@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "webapp"
+version = "0.1.0"
+description = ""
+authors = ["Amjad Saadeh <mail@amjadsaadeh.de>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+flask = "^2.3.1"
+flask-login = "^0.6.2"
+authlib = "^1.2.0"
+gunicorn = "^20.1.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

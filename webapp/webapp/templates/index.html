@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Start{% endblock %}
+
+{% block content %}
+<p>Hallo {{ session.name }}</p>
+
+<div>
+    Aktueller Speiseplan:
+    {% if progress != 'complete' %}
+        <p>In Bearbeitung</p>
+    {% else %}
+        {% for day, food in menu %}
+            <p>{{ day }}: {{ food }}</p>
+        {% endfor %}
+    {% endif %}
+</div>
+
+<div>
+    <h2>Neuen Speiseplan hochladen</h2>
+
+    <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <input type="submit" value="hochladen">
+    </form>
+</div>
+{% endblock %}
