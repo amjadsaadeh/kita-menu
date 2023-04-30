@@ -8,16 +8,6 @@ import functools
 from flask import Flask, request, session, render_template, url_for, redirect, flash
 from authlib.integrations.flask_client import OAuth
 
-from google.cloud import firestore, storage
-import google.auth.credentials
-
-try:
-    import googleclouddebugger
-
-    googleclouddebugger.enable(breakpoint_enable_canary=True)
-except ImportError:
-    pass
-
 
 BUCKET_NAME = "kita-menu-images"
 
@@ -25,8 +15,6 @@ BUCKET_NAME = "kita-menu-images"
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY")
 oauth = OAuth(app)
-
-db = firestore.Client()
 
 oauth.register(
     name="amazon",
@@ -74,6 +62,7 @@ def login_required(func: callable) -> callable:
 @app.route("/", methods=["GET"])
 @login_required
 def index():
+    # todo switch db
     menu_doc_ref = db.collection("menus").document(session["user_id"])
     menu_doc = menu_doc_ref.get().to_dict()
     if menu_doc is None:
@@ -152,13 +141,14 @@ def upload():
             return redirect(request.url)
 
         if file and allowed_file(file.filename):
+            # todo changw db
             # Set progress to processing
             doc_ref = db.collection("progress").document(session["user_id"])
             doc_ref.set({"state": "upload"})
 
             file_ext = file.filename.rsplit(".", 1)[-1].lower()
             file.save("tmp.{:s}".format(file_ext))
-            client = storage.Client()
+            client = storage.Client()  # use s3gw backend
             bucket = client.bucket(BUCKET_NAME)
             blob = bucket.blob("{:s}.{:s}".format(session["user_id"], file_ext))
             blob.upload_from_filename("tmp.{:s}".format(file_ext))
